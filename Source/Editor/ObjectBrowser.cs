@@ -111,10 +111,7 @@ internal class ObjectBrowser : Viewport {
 
         AlignTextToFramePadding();
         PushFont(Fonts.ImMontserratRegular);
-        var cp = GetCursorPos();
         var cleanLabel = Generators.SplitCamelCase(label);
-        Text(cleanLabel);
-        SetCursorPos(cp + new Vector2(0.3f, 0));
         Text(cleanLabel);
         PopFont();
         NextColumn();

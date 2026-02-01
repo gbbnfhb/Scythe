@@ -25,6 +25,7 @@ internal class Script(Obj obj) : Component(obj) {
     public static LuaColor? LuaColor;
 
     public static void Register() {
+		UserData.DefaultAccessMode = InteropAccessMode.Reflection; 
 
         // Objects & components
         UserData.RegisterType<Obj>();
@@ -39,6 +40,7 @@ internal class Script(Obj obj) : Component(obj) {
         UserData.RegisterType<Rigidbody>();
         UserData.RegisterType<BoxCollider>();
         UserData.RegisterType<SphereCollider>();
+        UserData.RegisterType<Sprite2D>();
 
         // Libraries & class data types
         UserData.RegisterType<LuaMt>();
@@ -78,6 +80,7 @@ internal class Script(Obj obj) : Component(obj) {
         UserData.RegisterType<Quaternion>();
         UserData.RegisterType<Color>();
         UserData.RegisterType<LuaKey>();
+
 
         // Generate definitions
         Make(generateDefinitions: true);
