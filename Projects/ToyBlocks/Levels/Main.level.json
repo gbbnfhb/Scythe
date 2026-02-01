@@ -48,7 +48,7 @@
           },
           "Euler": {
             "X": -164.54074,
-            "Y": 77.33564,
+            "Y": 77.33563,
             "Z": 176.01686
           },
           "Scale": {
@@ -378,6 +378,41 @@
           },
           "Script": {
             "Path": "Explode"
+          }
+        }
+      },
+      "2Dsprite": {
+        "Children": {},
+        "Transform": {
+          "Scale": {
+            "X": 1.0,
+            "Y": 1.0,
+            "Z": 1.0
+          },
+          "Rot": {
+            "W": 1.0,
+            "IsIdentity": true
+          }
+        },
+        "Components": {
+          "Sprite2D": {
+            "TexturePath": "Images/Splash.png",
+            "X": 400.0,
+            "Y": 100.0,
+            "Width": 100.0,
+            "Height": 100.0,
+            "Xaxis": 50.0,
+            "Yaxis": 50.0,
+            "Rotation": 90.0,
+            "Tint": {
+              "R": 20,
+              "G": 100,
+              "B": 198,
+              "A": 255
+            }
+          },
+          "Script": {
+            "Path": "Scripts/Rotate.lua"
           }
         }
       }

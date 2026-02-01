@@ -1,6 +1,7 @@
 {
   "OpenTabs": [
-    "Scripts/Explode.lua"
+    "Scripts/Explode.lua",
+    "Scripts/Rotate.lua"
   ],
-  "ActiveTabIndex": 0
+  "ActiveTabIndex": 1
 }
