@@ -1,3 +1,14 @@
+・Objectのプロパティの文字が二重に表示されるのを修正  
+・Sprite2Dコンポーネントを追加  
+・ScriptEditerで日本語が表示されるようにした  
+※注意点  
+プロパティが大文字でもluaで使う時は先頭が小文字になるので注意  
+例)Rotation → rotation  
+<img width="1273" height="870" alt="無題" src="https://github.com/user-attachments/assets/2a478bee-a1ba-4e0f-9eda-a7b5c7a177fb" />
+
+
+
+
 # Scythe
 
 Scythe is a lightweight, C#-based game engine focused on modifiability and rapid iteration using [Raylib](https://github.com/raysan5/raylib).
@@ -136,4 +147,5 @@ Many post-processing shaders and various other shaders were taken from, or based
 
 
 [Bear Man PSX](https://skfb.ly/p9SUZ) by Bonvikt, licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+
 
