@@ -12,7 +12,7 @@ internal static class Fonts {
   private const int SmallSize = 11, NormalSize = 16, LargeSize = 32;
 
   public static ImFontPtr ImMontserratRegular, ImFontAwesomeSmall,
-      ImFontAwesomeNormal, ImFontAwesomeLarge;
+      ImFontAwesomeNormal, ImFontAwesomeLarge, ImJapaneseFont;
 
   public static Font RlMontserratRegular, RlCascadiaCode, RlIpafont;
 
@@ -39,6 +39,7 @@ internal static class Fonts {
           LoadFont<ImFontPtr>("Fonts/fa7-free-solid.otf", NormalSize, true);
       ImFontAwesomeLarge =
           LoadFont<ImFontPtr>("Fonts/fa7-free-solid.otf", LargeSize, true);
+      ImJapaneseFont = LoadFont<ImFontPtr>("Fonts/ipam.ttf");
 
       ReloadFonts();
     }
