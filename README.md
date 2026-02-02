@@ -1,10 +1,12 @@
 ・Objectのプロパティの文字が二重に表示されるのを修正  
 ・Sprite2Dコンポーネントを追加  
 ・ScriptEditerで日本語が表示されるようにした  
+・scriptをprojectから右クリでopenする様にした。既に開いてるときは出ない  
+  <img width="340" height="249" alt="無題" src="https://github.com/user-attachments/assets/367e9b4a-f594-4e21-b855-d040bfc06396" />  
 ※注意点  
 プロパティが大文字でもluaで使う時は先頭が小文字になるので注意  
 例)Rotation → rotation  
-<img width="1273" height="870" alt="無題" src="https://github.com/user-attachments/assets/2a478bee-a1ba-4e0f-9eda-a7b5c7a177fb" />
+<img width="1273" height="870" alt="無題" src="https://github.com/user-attachments/assets/2a478bee-a1ba-4e0f-9eda-a7b5c7a177fb" />  
 
 
 
@@ -147,5 +149,6 @@ Many post-processing shaders and various other shaders were taken from, or based
 
 
 [Bear Man PSX](https://skfb.ly/p9SUZ) by Bonvikt, licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+
 
 
