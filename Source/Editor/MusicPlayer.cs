@@ -486,7 +486,7 @@ internal class MusicPlayer() : Viewport("Music Player")
 			while (_position + count > Length)
 			{
 
-				Thread.Sleep(5);
+				Thread.Sleep(1/*5*/);
 
 				if (count == 0) return 0;
 			}
