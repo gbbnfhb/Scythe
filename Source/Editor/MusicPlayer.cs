@@ -181,84 +181,91 @@ internal class MusicPlayer() : Viewport("Music Player")
 		Task.Run(
 			async () => {
 
-				try
+				_isPlaying = true; // Mark as playing early to show UI state
+				_ = StartMetadataLoop(token);
+
+				while (!token.IsCancellationRequested && _isPlaying)
 				{
-					_ = StartMetadataLoop(token);
-
-					if (!IsAudioDeviceReady()) InitAudioDevice();
-
-					// Standard buffer size for Linux stability, increased for background resilience
-					const int streamBufferSize = 8192;
-					SetAudioStreamBufferSizeDefault(streamBufferSize);
-
-					_httpClient = new HttpClient();
-					// Browser-like User-Agent
-					_httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-
-					_networkStream = await _httpClient.GetStreamAsync(Url, token);
-
-					// Wrap in a simple seekable buffer
-					var streamingBuffer = new StreamingMemoryBuffer(_networkStream);
-					_mpegFile = new MpegFile(streamingBuffer);
-
-					var channels = _mpegFile.Channels;
-					var sampleRate = _mpegFile.SampleRate;
-
-					_audioStream = LoadAudioStream((uint)sampleRate, 32, (uint)channels);
-					SetAudioStreamVolume(_audioStream.Value, _volume);
-
-					// Buffer to decode into
-					var decodeBuffer = new float[streamBufferSize * channels];
-
-					// PRE-ROLL: Ensure we have enough data initially
-					while (streamingBuffer.Length < 128 * 1024 && !token.IsCancellationRequested) await Task.Delay(100, token);
-
-					PlayAudioStream(_audioStream.Value);
-					_isPlaying = true;
-					_isConnecting = false;
-
-					// This decouples audio from the GUI frame rate, eliminating stuttering.
-					while (!token.IsCancellationRequested && _isPlaying)
+					try
 					{
+						if (!IsAudioDeviceReady()) InitAudioDevice();
 
-						if (IsAudioStreamProcessed(_audioStream.Value))
+						const int streamBufferSize = 8192;
+						SetAudioStreamBufferSizeDefault(streamBufferSize);
+
+						_httpClient = new HttpClient();
+						_httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+
+						_networkStream = await _httpClient.GetStreamAsync(Url, token);
+						var streamingBuffer = new StreamingMemoryBuffer(_networkStream);
+						_mpegFile = new MpegFile(streamingBuffer);
+
+						var channels = _mpegFile.Channels;
+						var sampleRate = _mpegFile.SampleRate;
+
+						_audioStream = LoadAudioStream((uint)sampleRate, 32, (uint)channels);
+						SetAudioStreamVolume(_audioStream.Value, _volume);
+
+						var decodeBuffer = new float[streamBufferSize * channels];
+
+						// Wait for initial buffer
+						while (streamingBuffer.Length < 64 * 1024 && !token.IsCancellationRequested && !streamingBuffer.IsEnded)
+							await Task.Delay(100, token);
+
+						if (token.IsCancellationRequested || streamingBuffer.IsEnded)
 						{
-
-							var read = _mpegFile.ReadSamples(decodeBuffer, 0, decodeBuffer.Length);
-
-							if (read > 0)
-							{
-
-								unsafe
-								{
-
-									fixed (float* p = decodeBuffer) UpdateAudioStream(_audioStream.Value, p, read / channels);
-								}
-
-								// Update visualization samples
-								lock (_lock)
-								{
-
-									for (var i = 0; i < read && _sampleIdx < FftSize; i += channels) _samples[_sampleIdx++] = decodeBuffer[i];
-								}
-							}
+							CleanupAudio();
+							if (token.IsCancellationRequested) break;
+							await Task.Delay(1000, token);
+							continue;
 						}
 
-						// Tight loop for audio pumping, but yield to OS
-						await Task.Delay(5, token);
+						PlayAudioStream(_audioStream.Value);
+						_isConnecting = false;
+
+						// Audio pumping loop
+						while (!token.IsCancellationRequested && _isPlaying)
+						{
+							if (IsAudioStreamProcessed(_audioStream.Value))
+							{
+								var read = _mpegFile.ReadSamples(decodeBuffer, 0, decodeBuffer.Length);
+
+								if (read > 0)
+								{
+									unsafe
+									{
+										fixed (float* p = decodeBuffer) UpdateAudioStream(_audioStream.Value, p, read / channels);
+									}
+
+									lock (_lock)
+									{
+										for (var i = 0; i < read && _sampleIdx < FftSize; i += channels)
+											_samples[_sampleIdx++] = decodeBuffer[i];
+									}
+								}
+								else if (streamingBuffer.IsEnded)
+								{
+									// Stream reached end, trigger reconnect
+									break;
+								}
+							}
+
+							await Task.Delay(5, token);
+						}
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine($"[MusicPlayer] Audio Loop Error: {ex.Message}");
+						await Task.Delay(2000, token);
+					}
+					finally
+					{
+						CleanupAudio();
 					}
 				}
-				catch (Exception ex)
-				{
 
-					Console.WriteLine($"[MusicPlayer] Error: {ex.Message}");
-					Cleanup();
-				}
-				finally
-				{
-					_isConnecting = false;
-				}
-
+				_isPlaying = false;
+				_isConnecting = false;
 			},
 			token
 		);
