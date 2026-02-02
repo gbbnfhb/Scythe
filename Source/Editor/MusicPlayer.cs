@@ -187,14 +187,13 @@ internal class MusicPlayer() : Viewport("Music Player")
 
 					if (!IsAudioDeviceReady()) InitAudioDevice();
 
-					// Standard buffer size for Linux stability
-					const int streamBufferSize = 4096;
+					// Standard buffer size for Linux stability, increased for background resilience
+					const int streamBufferSize = 8192;
 					SetAudioStreamBufferSizeDefault(streamBufferSize);
 
 					_httpClient = new HttpClient();
-					// ブラウザのふりをする設定を追加
+					// Browser-like User-Agent
 					_httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-					//_httpClient.DefaultRequestHeaders.Add("Icy-MetaData", "1");// これを追加：ストリームの中に曲名を混ぜて送ってね、という合図
 
 					_networkStream = await _httpClient.GetStreamAsync(Url, token);
 
@@ -269,11 +268,15 @@ internal class MusicPlayer() : Viewport("Music Player")
 
 	private void Cleanup()
 	{
-
 		_isPlaying = false;
 		_cts?.Cancel();
 		_cts = null;
 
+		CleanupAudio();
+	}
+
+	private void CleanupAudio()
+	{
 		if (_audioStream.HasValue)
 		{
 			StopAudioStream(_audioStream.Value);
@@ -420,6 +423,7 @@ internal class MusicPlayer() : Viewport("Music Player")
 
 		private long _position;
 		private readonly Lock _sync = new();
+		public bool IsEnded { get; private set; }
 
 		public StreamingMemoryBuffer(Stream source)
 		{
@@ -455,6 +459,10 @@ internal class MusicPlayer() : Viewport("Music Player")
 				{
 					/**/
 				}
+				finally
+				{
+					IsEnded = true;
+				}
 			}
 			);
 		}
@@ -482,13 +490,13 @@ internal class MusicPlayer() : Viewport("Music Player")
 		public override int Read(byte[] buffer, int offset, int count)
 		{
 
-			// Block if we haven't downloaded enough yet
-			while (_position + count > Length)
+			// Block if we haven't downloaded enough yet, but don't wait forever if the source is dead
+			while (_position + count > Length && !IsEnded)
 			{
 
-				Thread.Sleep(1/*5*/);
+				Thread.Sleep(1);
 
-				if (count == 0) return 0;
+				if (count == 0 || IsEnded) break;
 			}
 
 			lock (_sync)
