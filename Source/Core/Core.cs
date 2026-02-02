@@ -463,39 +463,76 @@ internal static class Core {
             }
         }
     }
+	/*
+		private static void RenderHierarchy(Obj obj, bool is2D, bool isShadowPass) {
 
-    private static void RenderHierarchy(Obj obj, bool is2D, bool isShadowPass) {
+			// Ensure components drawing. Transform is updated in Logic
+			if (isShadowPass) {
 
-        // Ensure components drawing. Transform is updated in Logic
-        if (isShadowPass) {
+				foreach (var component in obj.Components.Values) {
 
-            foreach (var component in obj.Components.Values) {
+					if (component is Model { CastShadows: true, IsLoaded: true } m) m.DrawShadow();
+				}
 
-                if (component is Model { CastShadows: true, IsLoaded: true } m) m.DrawShadow();
-            }
+			} else {
 
-        } else {
+				if (is2D)
+					obj.Transform.Render2D();
+				else
+					obj.Transform.Render3D();
 
-            if (is2D)
-                obj.Transform.Render2D();
-            else
-                obj.Transform.Render3D();
+				foreach (var component in obj.Components.Values) {
 
-            foreach (var component in obj.Components.Values) {
+					if (!component.IsLoaded) continue;
 
-                if (!component.IsLoaded) continue;
+					if (is2D)
+						component.Render2D();
+					else
+						component.Render3D();
+				}
+			}
 
-                if (is2D)
-                    component.Render2D();
-                else
-                    component.Render3D();
-            }
-        }
+			foreach (var child in obj.Children.Values.ToArray()) RenderHierarchy(child, is2D, isShadowPass);
+		}
+	*/
+	private static void RenderHierarchy(Obj obj, bool is2D, bool isShadowPass)
+	{
+		if (isShadowPass)
+		{
+			foreach (var component in obj.Components.Values)
+			{
+				if (component is Model { CastShadows: true, IsLoaded: true } m) m.DrawShadow();
+			}
+		}
+		else
+		{
+			// 1. まず自分自身の描画
+			if (is2D) obj.Transform.Render2D();
+			else obj.Transform.Render3D();
 
-        foreach (var child in obj.Children.Values.ToArray()) RenderHierarchy(child, is2D, isShadowPass);
-    }
+			// 2. コンポーネントの描画
+			// ※ 同じObj内のコンポーネント同士の順序は、追加順（または必要ならここでもソート）
+			foreach (var component in obj.Components.Values)
+			{
+				if (!component.IsLoaded) continue;
+				if (is2D) component.Render2D();
+				else component.Render3D();
+			}
+		}
 
-    private static RenderTexture2D _mainRt;
+		// 3. 子要素を「Z座標」でソートして再帰的に描画
+		// Zが大きい（奥にある）ものから先に描画したいので OrderByDescending
+		var sortedChildren = obj.Children.Values
+			.OrderByDescending(child => child.Transform.Pos.Z)
+			.ToArray();
+
+		foreach (var child in sortedChildren)
+		{
+			RenderHierarchy(child, is2D, isShadowPass);
+		}
+	}
+
+	private static RenderTexture2D _mainRt;
 
     public static void Step() {
 
