@@ -678,7 +678,7 @@ internal class ProjectBrowser : Viewport {
         // Context Menu
         if (BeginPopupContextItem($"ItemCMS_{path}")) {
 
-            // Select on right click if not selected
+            // Select on right click if not selected 右クリ
             if (!_selectedPaths.Contains(path)) {
 
                 _selectedPaths.Clear();
@@ -708,8 +708,15 @@ internal class ProjectBrowser : Viewport {
                 Separator();
             }
 
-            if (MenuItem("Delete")) DeleteSelectedItems();
-            if (MenuItem("Rename")) StartRename(path);
+			if (IsScript(path)){
+				if(!Editor.IsOpenScript(path)){
+					if (MenuItem("Open")) {
+						Editor.OpenScript(path);
+					}
+				}
+			}
+			if (MenuItem("Delete")) DeleteSelectedItems();
+			if (MenuItem("Rename")) StartRename(path);
 
             EndPopup();
         }

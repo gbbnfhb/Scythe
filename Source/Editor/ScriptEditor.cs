@@ -151,13 +151,25 @@ internal unsafe class ScriptEditor : Viewport {
     public int ActiveTabIndex { get; init; } = -1;
   }
 
-  public void Open(string path) {
+	public bool IsFileOpen(string path)	{
+
+		if (string.IsNullOrEmpty(path)) return false;
+
+		// 比較対象を正規化
+		var target = path.Replace('\\', '/');
+
+		// tab.FilePath?.Replace(...) とすることで、nullならReplaceを呼ばずにnullを返す
+		// その結果を target と比較するので、null == target は false になり安全
+		return _tabs.Any(tab => tab.FilePath?.Replace('\\', '/') == target);
+	}
+
+	public void Open(string path) {
 
     if (_tabs.FirstOrDefault(tab => tab.FilePath == path) is {} t)
       _activeTabIndex = _tabs.IndexOf(t);
     else
       NewTab(path);
-  }
+}
 
   private void NewTab(string path) {
 
