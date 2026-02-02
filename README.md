@@ -4,7 +4,7 @@
 ・scriptをprojectから右クリでopenする様にした。既に開いてるときは出ない  
 <img width="340" height="249" alt="無題" src="https://github.com/user-attachments/assets/367e9b4a-f594-4e21-b855-d040bfc06396" />  
   
-・Music Playerをlisten.moeに変更。あとタイトルとアーティスト名が出るようにした。もちろん日本語名対応。ただこのサイトやや重いです  
+・Music Playerをlisten.moeに変更。あとタイトルとアーティスト名が出るようにした。もちろん日本語名対応。~~ただこのサイトやや重いです~~ こちらのせいでした、修正しました。    
 <img width="331" height="171" alt="無題" src="https://github.com/user-attachments/assets/c5a72f09-daf9-4087-befb-ed2731ecb5f0" />  
 
 
@@ -154,6 +154,7 @@ Many post-processing shaders and various other shaders were taken from, or based
 
 
 [Bear Man PSX](https://skfb.ly/p9SUZ) by Bonvikt, licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+
 
 
 
