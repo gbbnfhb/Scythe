@@ -29,9 +29,11 @@ internal static unsafe class Editor {
 
     public static bool IsScriptEditorFocused => ScriptEditor.IsFocused;
 
-    public static void OpenScript(string path) => ScriptEditor.Open(path);
+	public static void OpenScript(string path) => ScriptEditor.Open(path);
 
-    public static void OpenLevel(string path) {
+	public static bool IsOpenScript(string path) => ScriptEditor.IsFileOpen(path);
+
+	public static void OpenLevel(string path) {
 
         var name = Path.GetFileNameWithoutExtension(path);
         Core.OpenLevel(name, path);
