@@ -14,13 +14,13 @@ internal class Sprite2D(Obj obj) : Component(obj) {
 
     [Label("Texture Path"), JsonProperty, RecordHistory]
     public string TexturePath { get; set; } = "Images/Splash.png";
-
+/*
     [Label("X"), JsonProperty, RecordHistory]
     public float X { get; set; } = 0;
 
     [Label("Y"), JsonProperty, RecordHistory]
     public float Y { get; set; } = 0;
-
+*/
     [Label("Width"), JsonProperty, RecordHistory]
     public float Width { get; set; } = 100;
 
@@ -49,13 +49,13 @@ internal class Sprite2D(Obj obj) : Component(obj) {
         return true;
     }
 
-    public override void Render2D() {
+    public override void Render2D(Vector3 pos) {
         
         if (_textureAsset == null || !_textureAsset.IsLoaded) return;
 
         var texture = _textureAsset.Texture;
         var sourceRec = new Rectangle(0, 0, texture.Width, texture.Height);
-        var destRec = new Rectangle(X, Y, Width, Height);
+        var destRec = new Rectangle(pos.X, pos.Y, Width, Height);
         var origin = new Vector2(Xaxis, Yaxis);
 
         Raylib.DrawTexturePro(texture, sourceRec, destRec, origin, Rotation, Tint);
