@@ -1,5 +1,5 @@
 ・Objectのプロパティの文字が二重に表示されるのを修正  
-・Sprite2Dコンポーネントを追加。座標はTransformのPosを使うように修正。TransformのZが大きい方が奥に表示されるにしました。   
+・Sprite2Dコンポーネントを追加。座標はTransformのPosを使うように修正。TransformのZが大きい方が奥に表示されます。   
   
 ・ScriptEditerで日本語が表示されるようにした  
 ・scriptをprojectから右クリでopenする様にした。既に開いてるときは出ない  
@@ -156,6 +156,7 @@ Many post-processing shaders and various other shaders were taken from, or based
 
 
 [Bear Man PSX](https://skfb.ly/p9SUZ) by Bonvikt, licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+
 
 
 
