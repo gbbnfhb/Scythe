@@ -250,7 +250,7 @@ internal class MusicPlayer() : Viewport("Music Player")
 								}
 							}
 
-							await Task.Delay(5, token);
+							await Task.Delay(1, token);
 						}
 					}
 					catch (Exception ex)
@@ -273,13 +273,17 @@ internal class MusicPlayer() : Viewport("Music Player")
 
 	private void Stop() => Cleanup();
 
+bool	_toend= false;
+
 	private void Cleanup()
 	{
-		_isPlaying = false;
-		_cts?.Cancel();
-		_cts = null;
-
-		CleanupAudio();
+		
+				_isPlaying = false;
+				_cts?.Cancel();
+				_cts = null;
+			_toend = true;//スレッドを即座に終わらせない
+				//CleanupAudio();
+		
 	}
 
 	private void CleanupAudio()
@@ -353,6 +357,11 @@ internal class MusicPlayer() : Viewport("Music Player")
 
 		EndGroup();
 
+		if(_toend)
+		{
+			CleanupAudio();
+			_toend = false;
+		}
 		// Main thread only handles visualization
 		var winSize = GetContentRegionAvail();
 
