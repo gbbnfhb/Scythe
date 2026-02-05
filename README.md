@@ -8,7 +8,7 @@
 ・Music Playerをlisten.moeに変更。あとタイトルとアーティスト名が出るようにした。もちろん日本語名対応。~~ただこのサイトやや重いです~~ こちらのせいでした、修正しました。    
 ・バックグラウンド時、曲のタイトルは変わるのに音楽が止まってしまう問題を修正した。自動再接続ループの導入、ストリーム終了の検知、初期バッファ待ちの最適化など  
 <img width="331" height="171" alt="無題" src="https://github.com/user-attachments/assets/c5a72f09-daf9-4087-befb-ed2731ecb5f0" />  
-
+・musicを止めると高確率で落ちるのを修正。人が折角直したのAIに上書きされてた。これだからAIは┐(´∀｀)┌ﾔﾚﾔﾚ  
 
 ※注意点  
 プロパティが大文字でもluaで使う時は先頭が小文字になるので注意  
@@ -156,6 +156,7 @@ Many post-processing shaders and various other shaders were taken from, or based
 
 
 [Bear Man PSX](https://skfb.ly/p9SUZ) by Bonvikt, licensed under [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+
 
 
 
