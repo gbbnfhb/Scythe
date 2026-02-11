@@ -191,7 +191,8 @@ internal class MusicPlayer() : Viewport("Music Player")
 					{
 						if (!IsAudioDeviceReady()) InitAudioDevice();
 
-						const int streamBufferSize = 4096/*8192*/;
+						//ここは回線の速さによる。光回線なら8192でも余裕なはず。
+						const int streamBufferSize = 18000/*8192*/;
 						SetAudioStreamBufferSizeDefault(streamBufferSize);
 
 						_httpClient = new HttpClient();
@@ -210,14 +211,15 @@ internal class MusicPlayer() : Viewport("Music Player")
 						var decodeBuffer = new float[streamBufferSize * channels];
 
 						// Wait for initial buffer
-						while (streamingBuffer.Length < 16/*64*/ * 1024 && !token.IsCancellationRequested && !streamingBuffer.IsEnded)
-							await Task.Delay(10/*100*/, token);
+						//pulse audioのprebufが22082なので。曲の頭では少ないバッファでやるのがいいらしい
+						while (streamingBuffer.Length < 21/*64*/ * 1024 && !token.IsCancellationRequested && !streamingBuffer.IsEnded)
+							await Task.Delay(100/*100*/, token);
 
 						if (token.IsCancellationRequested || streamingBuffer.IsEnded)
 						{
 							CleanupAudio();
 							if (token.IsCancellationRequested) break;
-							await Task.Delay(1000, token);
+							await Task.Delay(100, token);
 							continue;
 						}
 
@@ -449,7 +451,7 @@ bool	_toend= false;
 
 			Task.Run(async () => {
 
-				var buffer = new byte[4096/*32768*/];
+				var buffer = new byte[24000/*32768*/];
 
 				try
 				{
