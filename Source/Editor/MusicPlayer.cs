@@ -109,7 +109,7 @@ internal class MusicPlayer() : Viewport("Music Player")
 			catch (Exception ex)
 			{
 				Console.WriteLine($"[MusicPlayer] Metadata WebSocket Error: {ex.Message}");
-				await Task.Delay(5000, token);
+				await Task.Delay(2500/*5000*/, token);
 			}
 		}
 	}
@@ -131,7 +131,7 @@ internal class MusicPlayer() : Viewport("Music Player")
 		return path;
 	}
 
-	public void Load()
+	public async void Load()
 	{
 
 		var path = GetPath();
@@ -141,14 +141,15 @@ internal class MusicPlayer() : Viewport("Music Player")
 		try
 		{
 
-			var settings = JsonConvert.DeserializeObject<MusicPlayerSettings>(File.ReadAllText(path));
+			var jsonContent = await File.ReadAllTextAsync(path);
+			var settings = JsonConvert.DeserializeObject<MusicPlayerSettings>(jsonContent);
 			_volume = settings.Volume;
 			if (settings.IsPlaying) Play();
 
 		}
-		catch
+		catch (Exception ex)
 		{
-			/**/
+			Console.WriteLine($"[MusicPlayer] Failed to load settings: {ex}");
 		}
 	}
 
@@ -190,7 +191,7 @@ internal class MusicPlayer() : Viewport("Music Player")
 					{
 						if (!IsAudioDeviceReady()) InitAudioDevice();
 
-						const int streamBufferSize = 8192;
+						const int streamBufferSize = 4096/*8192*/;
 						SetAudioStreamBufferSizeDefault(streamBufferSize);
 
 						_httpClient = new HttpClient();
@@ -209,8 +210,8 @@ internal class MusicPlayer() : Viewport("Music Player")
 						var decodeBuffer = new float[streamBufferSize * channels];
 
 						// Wait for initial buffer
-						while (streamingBuffer.Length < 64 * 1024 && !token.IsCancellationRequested && !streamingBuffer.IsEnded)
-							await Task.Delay(100, token);
+						while (streamingBuffer.Length < 16/*64*/ * 1024 && !token.IsCancellationRequested && !streamingBuffer.IsEnded)
+							await Task.Delay(10/*100*/, token);
 
 						if (token.IsCancellationRequested || streamingBuffer.IsEnded)
 						{
@@ -256,7 +257,7 @@ internal class MusicPlayer() : Viewport("Music Player")
 					catch (Exception ex)
 					{
 						Console.WriteLine($"[MusicPlayer] Audio Loop Error: {ex.Message}");
-						await Task.Delay(2000, token);
+						await Task.Delay(1000/*2000*/, token);
 					}
 					finally
 					{
@@ -448,7 +449,7 @@ bool	_toend= false;
 
 			Task.Run(async () => {
 
-				var buffer = new byte[32768];
+				var buffer = new byte[4096/*32768*/];
 
 				try
 				{
